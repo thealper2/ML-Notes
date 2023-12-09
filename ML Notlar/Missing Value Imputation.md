@@ -1,0 +1,118 @@
+
+# Removing
+```python
+data.dropna(inplace=True)
+data['column_name'].dropna(inplace=True)
+```
+
+# Fill
+
+```python
+data['column_name'].fillna('?')
+```
+
+# Mean / Median / Mode Imputation
+1. **Mean**: Eğer veri numerikse ve çarpık (not skewed) değilse. Veri normal dağılımlıysa ve aykırı değerlerin etkisi minimize edilmek isteniyorsa kullanılır. Fakat, aykırı değerler varsa ortalama, bu aykırı değerlerden etkilenebilir. 
+2. **Medyan**: Eğer veri numerikse ve çarpık (skewed) ise. Veri setinde aykırı değerler varsa veya dağılım çarpık ise (asimetrik dağılım) kullanılır. Medyan sıralı değerlerin ortasındaki değeri alır, bu da aykırı değerlerin etkisini azaltabilir.
+3. **Mode**: Eğer veri kategorikse veya numerikse. Özellikle sık tekrar eden değerleri yerine koymak için uygundur. Ancak mod, veri setinde birden fazla değer için eşit sıklıkta tekrar eden bir durumda ise (örneğin bir veri setindeki x sutununda 3 adet A, 4 adet B, 3 adet C olursa mod hem a hem c eşit oluyor.) veya veri mod ile doldurulduğunda veri seti çeşitliliğini kaybediyorsa bu durumda mod tercih edilmeyebilir.
+
+```python
+# scikit
+imputer = SimpleImputer(strategy='median')
+X_train = imputer.fit_transform(X_train)
+X_test = imputer.transform(X_test)
+```
+
+# Frequent Category Imputation
+Eksik kategorik verilerin yerine en sık görülen değeri (mod) yerleştirerek tamamlama tekniğidir. 
+
+```python
+# scikit-learn
+imputer = SimpleImputer(strategy='most_frequent')
+
+# feature_engine
+cv_imputer = CategoricalVariableImputer(variables=['A4', 'A5', 'A6', 'A7'], imputation_method='frequent')
+cv_imputer.fit(X_train)
+```
+
+# Arbitrary Number Impute (ANİ)
+Eksik verileri doldurmak için önceden belirlenmiş bir sabit sayıyla (örn -999, 999 gibi) doldurulur. Önceden belirlenmiş sayı, verinin gerçek dağılımını bozmayacak şekilde seçilmelidir.
+
+```python
+X_train[var].fillna(99, inplace=True)
+
+# scikit
+imputer = SimpleImputer(strategy='constant', fill_value=99)
+
+# feature_engine
+imputer = ArbitraryNumberImputer(arbitrary_number=99, variables=['column_name'])
+```
+
+# Bespoke Category
+Özel veya birleştirilmiş bir kategori oluşturmayı ifade eder. Mevuct olmayan veya diğer kategorilere uymayan veriler için özel bir kategori oluşturmak gerekebilir.
+```python
+# scikit
+imputer = SimpleImputer(strategy='constant', fill_value='missing')
+
+# feature_engine
+imputer = CategoricalVariableImputer(variables=['column_name'])
+```
+
+# End Tail Imputation
+Bir değişkenin uç noktalarında bulunan değerleri (örneğin en küçük veay en büyük) kullanarak eksik verileri doldurmayı ifade eder. Aykırı değerlere odaklanan ve bu değerleri kullanarak eksik verileri tahmin etmeye çalışan bir yaklaşımdır.
+
+```python
+# scikit
+IQR = X_train[var].quantile(0.75) - X_train[var].quantile(0.25)
+value = X_train[var].quantile(0.75) + 1.5 * IQR
+
+X_train[var] = X_train[var].fillna(value)
+X_test[var] = X_test[var].fillna(value)
+
+# feature_engine
+EndTailImputer(distribution='skewed', tail='right', variables=['column'])
+```
+
+# Random Sample Imputation
+Eksik değerler, mevcut veri setinden rastgele seçilen diğer gözlemlerin değerleriyle doldurulur. Veri setinin yapısına ve eksikliklerinin dağılımına bağlı olarak, bu yöntemin doğruluğu ve etkililiği değişebilir. Veri seti dengesizse doğru sonuçlar vermeyebilir. Eksik verilerin oranı yüksekse, verilerin orjinal dağılımı bozulabilir.
+- **Variable Specific**: Eksik değerler, sadece aynı değişkenin mevcut değerlerinden seçilen değerlerle doldurulur.
+- **Dataset-wide**: Eksik değerler, tüm veri setindeki mevcut değerlerden seçilen değerlerle doldurulur.
+- **K-nearest neighbor**: Eksik değerler, kendisine en yakın olan k mevcut değerden seçilen değerlerle doldurulur.
+
+```python
+# scikit
+random_sample_train = X_train['column_name'].dropna().sample(X_train['column_name'].isnull().sum(), random_state=0)
+random_sample_train.index = X_train[X_train['column_name'].isnull()].index
+X_train.loc[X_train['column_name'].isnull(), 'column_name'] = random_sample_train
+
+# feature_engine
+imputer = RandomSampleImputer()
+imputer.fit(X_train)
+```
+
+# Missing Indicator
+Eksik verilerin varlığını göstermek amacıyla yeni bir değişken oluşturma yöntemidir. Bu yaklaşım, bir değişkenin eksik olup olmadığını göstermek için yeni bir ikincil değişken veya gösterge oluşturmayı içerir.  Eksik verilerin oluşturduğu bilgi kaybını azaltmak ve eksik verilerin veri analizi süreçlerinde dikkate alınmasını sağlamak, değişkeni eksik verilerin belirli bir deseni veya yapısal bir özellik taşıyıp taşımadığını anlamak için kullanılabilir.
+
+```python
+# scikit
+indicator = MissingIndicator(error_on_new=True, features='missing-only')
+```
+
+# Multiple Imputation by Chained Equations (MICE)
+Eksik verileri tahmin etmek ve doldurmak için bir dizi modelleme süreci kullanır. Verilerin orjinal dağılımını korumaya yardımcı olur. Eksik verilerin her bir değişkeni için ayrı ayrı tahmin edilmesini içerir. Eksik verileri doldurmak için esnek ve kapsamlı bir yöntemdir ve regresyon, lojistik regresyon, karar ağaçları gibi farklı modellerin bir araya getirilmesiyle kullanılabilir. Çoklu imputasyon yöntemlerinden biridir.
+- **Simple MICE**: Her değişken için ayrı bir model oluşturulur.
+- **Full conditional specification (FCS) MICE:** Her bir değişkenin diğer tüm değişkenler göz önünde bulundurularak tahmin edildiği bir model oluşturur.
+- **Joint modeling MICE**: Tüm değişkenler için birlikte bir model oluşturulur.
+
+```python
+knn_imputer = IterativeImputer(estimator=KNeighborsRegressor(n_neighbors=5), max_iter=10, random_state=0)
+bayes_imputer = IterativeImputer(estimator=BayesianRidge(), max_iter=10, random_state=0)
+```
+
+# Forward and Backward Fill
+Eksik veriyi kendinden bir önceki (bfill) veya kendinden bir sonraki (ffill) veri ile doldurur.
+
+```python
+data = df.fillna(method='ffill')
+data = df.fillna(method='bfill')
+```
