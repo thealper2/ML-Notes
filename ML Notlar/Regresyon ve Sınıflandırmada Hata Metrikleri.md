@@ -94,6 +94,36 @@ F1 = 2 * -------------------
 #### ROC - AUC Eğrisi (ROC-AUC Curve)
 - ROC modelin TPR ile FPR cinsinden ne kadar iyi ayrım yapabildiğini açıklar. AUC, ROC eğrisinin altında kalan alanı verir, 0-1 arasındadır. 0'ise bütün tahminler yanlıştır. 1'e yaklaştıkça modelin performansı iyileşir. ROC-AUC 0.5 ise, modelin performansı rastgele tahmin etmekle (yazı-tura tahmini %50-%50) aynıdır.
 
+#### Balanced Accuracy Score 
+- Dengesiz veri kümelerinde kullanılır. Her sınıfın doğruluk oranını dengeler ve ardından tüm sınıfların doğruluk oranlarının ortalamasını alır. Her bir sınıfın veri dağılımındaki etkisini eşit şekilde değerlendirir.
+
+```shell
+(1 / N) * E(TP / P)
+```
+
+#### Top K Accuracy Score
+- Modelin en yüksek olasılığı sahip olan k tahmininin doğru sınıfı içerip içermediğini kontrol eder. Genelde çoklu sınıflı sınıflandırma problemlerinde kullanılır. 
+```shell
+(1 / N) * E(1 => If true class in top-k predictions else 0)
+```
+
+#### Average Precision Score
+- Dengesiz veri kümelerinde ve precision-recall analizlerinde kullanılır. Modelin gerçek pozitiflerini doğru bir şekilde saptama yeteneği ve yanlış pozitifler oluşturma konusundaki hassasiyetini gösterir. Precision-Recall eğrisi altında kalan alanı ifade eder. Precision-Recall eğrisi farklı kesme noktalarındaki precision ve recall değerlerini gösterir. Average precision, bu eğrinin altındaki alanın ortalamasını alarak hesaplanır. 1'e ne kadar yakınsa model o kadar iyi performans göstermiştir.
+
+```shell
+(1 / N) * E(Recall değeri k - Recall değeri k-1) * (Recall değeri k olduğunda Precision)
+```
+
+#### Log Loss
+- Sınıflandırma modellerinin tahminlerinin olasılık dağılımıyla uyumunu ölçen bir metriktir. Gerçek etiketlerin olasılık dağılımı ve modelin ürettiği olasılık dağılımı arasındaki farkı ölçerek modelin kalitesini değerlendirir. Ne kadar düşükse o kadar iyidir. Modelin tahminleri gerçek etiketlere daha yakınsa, log_loss değeri daha düşük olur. Model ne kadar belirsiz tahminler yapıyorsa log_loss o kadar yüksek olur.
+
+#### Jaccard Score
+- İkili sınıflandırma problemleri için kullanılır. Modelin gerçek pozitif ve negatif sınıfları ne kadar iyi tahmin ettiğini ölçer. Gerçek ve tahmin edilen sınıfların kesişimini gerçek ve tahmin edilen sınıfların birleşimine böler. 1'e ne kadar yakınsa o kadar iyidir.
+
+```shell
+TP / (TP + FP + FN)
+```
+
 # Regresyon Metrikleri
 
 ---
@@ -131,5 +161,56 @@ RMSE = √MSE
 
 ```shell
 MPE = (1/n) * Σ((yi - ŷi) / yi) * 100, n gözlem sayısını, yi gerçek değeri, ŷi tahmini değeri temsil eder.
+```
+
+#### Explained Variance Score
+Modelin verideki değişkenliğin ne kadarını açıkladığını ölçer. 1' ne kadar yakınsa o kadar iyidir. Eğer 0 ise model verideki değişkenliği açıklayamıyor demektir. Eğer negatif ise model basit bir ortalama kullanmaktan daha kötü performans gösteriyor demektir. Modelin gerçek değerler üzerinde ne kadar başarılı tahminler yaptığını ve bu tahminlerin gerçek verideki değişkenliği ne kadar açıkladığını anlamak için kullanılır.
+
+```shell
+1 - ( (Var(y-y^) / (Var(y)) ) )
+```
+
+#### Max Error
+Modelin gerçek ve tahmin edilen değerler arasındaki en büyük farkı ölçer. Gerçek ve tahmin edilen değerler arasındaki maksimum mutlak farkı ifade eder. 
+
+```shell
+max(|yi - yi^|)
+```
+
+# Clustering Metrikleri
+---
+#### Mutual Info Score
+Gerçek sınıf metrikleri ile kümele sonuçları arasındaki ilişkiyi ölçer. Yüksek MIS değeri, kümeleme sonuçlarının gerçek sınıf etiketleriyle güçlü bir şekilde ilişkili olduğunu ve algoritmanın veri yapısını doğru bir şekilde kavradığını gösterir. Düşük MIS değeri, kümeleme sonuçlarının gerçek sınıf etiketlerine göre zayıf bir ilişki içinde olduğunu ve algoritmanın iyileştirilmesi gerektiğini gösterir.
+
+```shell
+MutualInfo(X, Y) / sqrt(Entropy(X)*Entropy(Y))
+```
+
+#### Rand Score
+Doğru olarak eşleştirilen örneklerin toplam örnek sayısına oranını hesaplar. 1'e ne kadar yakınsa o kadar iyi. Yüksek rand score, kümeleme sonuçlarının gerçek sınıf etiketleriyle iyi uyum içinde olduğunu ve doğru örneklerin bir araya getirildiğini gösterir.
+
+```shell
+(TP + TN) / (TP + FP + FN + TN)
+```
+
+#### Completeness Score
+Kümeleme sonuçları içinde aynı gerçek sınıfa ait olan örneklerin aynı kümede bir araya gelip gelmediğini ölçer. 1'e ne kadar yakınsa o kadar iyi. Yüksek Completeness Score, kümeleme sonuçlarının gerçek sınıfları tamamen yakaladığını ve aynı gerçek sınıfa ait olan örneklerin aynı kümede bir araya geldiğini gösterir.
+
+```shell
+
+```
+
+#### Homogenity Score
+Her kümenin tek sınıfa ait olup olmadığını ölçer. 1' ne kadar yakınsa o kadar iyi. Yüksek homojenlik, kümeleme sonuçlarının her kümenin tek bir gerçek sınıfa ait olduğunu ve homojen olduğunu gösterir.
+
+```shell
+1 - ( (Kümeleme sonuçlarına göre gerçek sınıfların entropi değeri) / (gerçek sınıfların entropi değeri) )
+```
+
+#### V-Measure Score
+Homojenlik ve tamamlanmışlık skorlarının harmonik ortalamasını alarak birleştirir. Yüksek V-Measure Score, kümeleme sonuçlarının hem homojenlik hem de tamamlanmışlık açısından başarılı olduğunu gösterir.
+
+```shell
+2 * ( (homogenity * completeness) / (homogenity + completeness) )
 ```
 
