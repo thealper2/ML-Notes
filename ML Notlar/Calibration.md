@@ -6,7 +6,14 @@ Kalibrasyon, modelin çıktılarını gerçek olasılıklara daha yakın hale ge
 
 ---
 # Platt Scaling (Sigmoid Fitting)
-Adını John Platt'ten alır. Genellikle sigmoid fonksiyonu ile gerçekleştirilir. İlk olarak sınıflandırıcı çıktıları log-odds'a dönüştürülür. Ardından, log-odds değerleri sigmoid fonksiyonuna geçirilir. Bu olasılıkları \[0, 1] aralığına yeniden ölçekler.
+Adını John Platt'ten alır. Genellikle sigmoid fonksiyonu ile gerçekleştirilir. İlk olarak sınıflandırıcı çıktıları log-odds'a dönüştürülür. Ardından, log-odds değerleri sigmoid fonksiyonuna geçirilir. Bu olasılıkları \[0, 1] aralığına yeniden ölçekler. Temel fikir modelin tahmin edilen sınıf olasılıklarına bir lojistik regresyon modeli uydurmaktır. Lojistik regresyon modeli, tahmin edilen olasılıklara dayalı olarak gerçek sınıf etiketlerini tahmin etmek üzere eğitilir ve modelin katsayıları tahmin edilen olasılıkları kalibre edilmiş olasılıklara dönüştürmek için kullanılır.
+
+```shell
+platt_cal = 1 / (1 + exp(-z))
+
+# z, Lojistik Regresyonun çıktısı
+z = log(p / (1 - p))
+```
 
 ```python
 from sklearn.calibration import CalibratedClassifierCV
@@ -23,7 +30,7 @@ probabilities_after = calibrated_svm.predict_proba(X_test)[:, 1]
 
 ---
 # Isotonic Regression
-Olasılık tahminlerini düzgünleştirmek için monoton artan bir fonksiyonla uyumlu hale getirir. İlk olarak, modelin olasılık tahminleri sıralanır. Monoton artan bir fonksiyon olan isotonic regression kullanılır. Bu regresyon, sıralı tahminler arasında bir düzgünleştirme yaparak olasılık tahminlerini yeniden ölçekler.
+Olasılık tahminlerini düzgünleştirmek için monoton artan bir fonksiyonla uyumlu hale getirir. İlk olarak, modelin olasılık tahminleri sıralanır. Monoton artan bir fonksiyon olan isotonic regression kullanılır. Bu regresyon, sıralı tahminler arasında bir düzgünleştirme yaparak olasılık tahminlerini yeniden ölçekler. İzotonik, olasılıkların sırasını korur.
 
 ```python
 from sklearn.calibration import CalibratedClassifierCV
