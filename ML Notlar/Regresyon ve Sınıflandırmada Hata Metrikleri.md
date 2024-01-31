@@ -177,6 +177,17 @@ Modelin gerçek ve tahmin edilen değerler arasındaki en büyük farkı ölçer
 max(|yi - yi^|)
 ```
 
+#### Winkler Interval Score
+Modelin tahminlerinin gerçek değer dağılımına ne kadar yakın olduğunu gösterir. Modelin ürettiği tahminler gerçek değerler dağılımına göre bir aralık ile sınırlandırılır. Aralıktaki tahminlerin oranı hesaplanır. 0-1 arasında değer alır. 1'e ne kadar yakınsa o kadar iyidir.
+
+```shell
+Winkler interval score = (1 - P(y - t ∉ I)) / 2
+# y : gerçek değer
+# t : modelin tahmini
+# I : tahminlerin sınırlandığı aralık
+# P() : olay olasılığı
+```
+
 # Clustering Metrikleri
 ---
 #### Mutual Info Score
