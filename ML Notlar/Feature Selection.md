@@ -118,3 +118,6 @@ sel_.get_support()
 rf = RandomForestClassifier().fit(X_train, y_train)
 rf.feature_importances_
 ```
+
+# MAPIE (Model Agnostic Parameter Importance Estimation)
+Modelin türünden bağımsızdır. 
