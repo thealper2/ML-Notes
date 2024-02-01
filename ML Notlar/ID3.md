@@ -1,0 +1,15 @@
+1986 yılında Ross Quinlan tarafından oluşturulmuştur. Veri setindeki öznitelikleri kullanarak bir karar ağacı oluşturur ve bu ağaç ile sınıflandırma yapar. ID3, kategorik değerlerle çalışabilir fakat sayısal değerleri doğrudan işleyemez.
+
+**Çalışma Adımları**
+1. Öznitelikler arasından en bilgilendirici olanları bulmak için bilgi kazancı (information gain) kullanır.
+2. Seçilen en bilgilendirici öznitelik, bir karar ağacının bir düğümü olarak kullanılır. Her düğüm, bu özniteliğin farklı değerlerine göre alt düğümlere bölünür.
+3. ID3, özniteliklerin dallanma noktalarını ve karar ağacındaki düğümleri oluşturur. Her bir düğüm, bir öznitelik ve bu özniteliğin değerlerine göre alt düğümlere bölünür.
+4. ID3, bu işlemi her alt düğüm için tekrarlar. Her bir alt düğüm, bir veri kümesinin daha homojen alt kümelerine bölünmesini sağlar.
+5. ID3, bu işlemi veri seti tamamen sınıflandırıldığında durdurur ve bir karar ağacı elde eder.
+
+```python
+from id3 import Id3Estimator
+
+classifier = Id3Estimator()
+classifier.fit(X_train, y_train)
+```
