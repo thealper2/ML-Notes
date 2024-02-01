@@ -3,6 +3,7 @@ Kalibrasyon, modelin çıktılarını gerçek olasılıklara daha yakın hale ge
 2. Isotonic Regression
 3. Beta Calibration
 4. Platt's Method Extension
+5. Venn-ABERS Method
 
 ---
 # Platt Scaling (Sigmoid Fitting)
@@ -95,6 +96,25 @@ lr.fit(logit_transformed_probs.reshape(-1, 1), y_test)
 
 scaled_probs = lr.predict_proba(logit_transformed_probs.reshape(-1, 1))[:, 1]
 ```
+
+---
+# Venn-ABERS
+Modelin tahminleri, modelin tahmin ettiği sınıfların gerçekte hangi oranda gerçekleştiğini gösteren bir referans dağılım ile karşılaştırılır. Karşılaştırma sonucunda, modelin tahminlerinin gerçek tahminlerden ne kadar saptığı hesaplanır. Bu sapmalar modelin tahminlerini düzeltmek için kullanılır. Dengesiz veri setlerinde etkilidir. 
+
+```python
+from venn_abers import VennAbersCalibrator
+from xgboost import XGBClassifier
+xgb = XGBClassifier().fit(X_train, y_train)
+p_test = xgb.predict_proba(X_test)
+p_cal = xgb.predict_proba(X_calib)
+vac = VennAbersCalibrator()
+# Inductive
+ivap = vac.predict_proba(p_cal=p_cal, y_cal=y_calib, p_test=p_test)[:, 1]
+# Cross
+vac_c = VennAbersCalibrator(estimator=xgb, inductive=False, n_splits=10).fit(X_train, y_train)
+cvap = vac_c.predict_proba(X_test)[:, 1]
+```
+
 
 ---
 # Metrikler
