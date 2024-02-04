@@ -1,4 +1,4 @@
-
+Extreme Gradient Boosting, ağaç tabanlı bir algoritmadır. Gradient Boosting yöntemini kullanır.
 
 # Hyperparameters
 
