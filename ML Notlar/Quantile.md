@@ -1,0 +1,1 @@
+Temel amacı, belirli yüzdelik dilimlerdeki (quantile) hedef değişkenlerin tahminini yapmaktır. Bu, verinin farklı yüzdeliklerde nasıl dağıldığını dikkate alarak regresyon yapmayı sağlar. Özellikle medyanın veya diğer yüzdelik değerlerinin tahmin edilmesinde kullanılır. Veri dağılımının herhangi bir yerindeki değerlerin tahmin edilmesini sağlar.
